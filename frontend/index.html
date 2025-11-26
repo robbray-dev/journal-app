@@ -17,10 +17,18 @@
       </header>
 
       <div class="calendar-controls" aria-label="Calendar navigation">
-        <button id="previousMonthBtn" class="icon-btn"></button>
+        <button id="previousMonthBtn" class="icon-btn"><</button>
         <select id="monthSelect"></select>
         <select id="yearSelect"></select>
+        <button id="nextMonthBtn" class="icon-btn">></button>
       </div>
+
+      <label class="search">
+        <span class="sr-only">Search Entries</span>
+        <input type="search" id="searchInput" placeholder="Search..." />
+      </label>
+
+      <button id="newEntrybtn" class="primary-btn">New Entry</button>
     </div>
   </body>
 </html>
