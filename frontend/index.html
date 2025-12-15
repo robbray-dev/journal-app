@@ -2,33 +2,153 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-wdith, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Journal Web App</title>
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="main.css" />
     <meta name="author" content="Robert Bray" />
   </head>
+
   <body>
     <div id="app">
+      <!-- Top bar -->
       <header class="topbar" role="banner">
-        <div class="brand">
-          <span class="logo">🗓️</span>
-          <h1 class="app-name">Journal</h1>
+        <button class="icon-btn ghost" aria-label="Menu">☰</button>
+
+        <div class="topbar-center">
+          <span class="topbar-title">Month</span>
+
+          <div class="nav-cluster" aria-label="Calendar navigation">
+            <button
+              id="previousMonthBtn"
+              class="icon-btn ghost"
+              aria-label="Previous month"
+            >
+              ‹
+            </button>
+
+            <div class="pager" aria-hidden="true">
+              <span class="dot active"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+
+            <button
+              id="nextMonthBtn"
+              class="icon-btn ghost"
+              aria-label="Next month"
+            >
+              ›
+            </button>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button class="icon-btn ghost" aria-label="Search">🔍</button>
+          <button class="icon-btn ghost" aria-label="Profile">☺</button>
         </div>
       </header>
 
-      <div class="calendar-controls" aria-label="Calendar navigation">
-        <button id="previousMonthBtn" class="icon-btn"><</button>
-        <select id="monthSelect"></select>
-        <select id="yearSelect"></select>
-        <button id="nextMonthBtn" class="icon-btn">></button>
-      </div>
+      <!-- Main layout -->
+      <main class="layout">
+        <!-- LEFT: calendar -->
+        <section class="calendar-pane">
+          <div class="calendar-head">
+            <div class="calendar-row">
+              <select id="monthSelect" class="select"></select>
+              <select id="yearSelect" class="select"></select>
+            </div>
 
-      <label class="search">
-        <span class="sr-only">Search Entries</span>
-        <input type="search" id="searchInput" placeholder="Search..." />
-      </label>
+            <div class="weekdays" aria-label="Weekdays">
+              <span>Mon</span><span>Tue</span><span>Wed</span> <span>Thu</span
+              ><span>Fri</span><span>Sat</span><span>Sun</span>
+            </div>
+          </div>
 
-      <button id="newEntrybtn" class="primary-btn">New Entry</button>
+          <!-- JS will dynamically render dates here -->
+          <div
+            class="calendar-grid"
+            id="calendarGrid"
+            role="grid"
+            aria-label="Monthly calendar"
+          ></div>
+        </section>
+
+        <!-- Divider -->
+        <div class="divider" aria-hidden="true"></div>
+
+        <!-- RIGHT: drawer -->
+        <aside class="drawer" id="entryDrawer" aria-label="Add Entry panel">
+          <div class="drawer-top">
+            <div>
+              <div class="drawer-kicker">Fleeting</div>
+              <h2 class="drawer-title">Add Entry</h2>
+            </div>
+
+            <button
+              class="icon-btn ghost"
+              id="closeDrawerBtn"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div class="drawer-card">
+            <div class="drawer-toggle">
+              <div class="toggle-left">
+                <span class="radio"></span>
+                <div>
+                  <div class="toggle-title">Abony</div>
+                  <div class="toggle-sub">Entry journal</div>
+                </div>
+              </div>
+
+              <label class="switch" aria-label="Enable">
+                <input type="checkbox" checked />
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="drawer-list">
+              <button class="drawer-item" type="button">
+                <span class="radio"></span>
+                <div class="item-body">
+                  <div class="item-title">Jun Latit</div>
+                  <div class="item-sub">Day</div>
+                  <div class="item-desc">Aim to publish a toe of 180…</div>
+                </div>
+                <span class="chev">›</span>
+              </button>
+
+              <button class="drawer-item" type="button">
+                <span class="radio"></span>
+                <div class="item-body">
+                  <div class="item-title">Accontry</div>
+                  <div class="item-sub">Entry</div>
+                  <div class="item-desc">
+                    Action set, all are you’re only you…
+                  </div>
+                </div>
+              </button>
+
+              <button class="drawer-item" type="button">
+                <span class="radio"></span>
+                <div class="item-body">
+                  <div class="item-title">Journal Entry’s</div>
+                  <div class="item-sub">New</div>
+                  <div class="item-desc">You mark your any full time the…</div>
+                </div>
+              </button>
+            </div>
+
+            <div class="drawer-footer">
+              <button id="newEntrybtn" class="pill-btn">+ Add Entry</button>
+            </div>
+          </div>
+        </aside>
+      </main>
     </div>
+
+    <script src="app.js"></script>
   </body>
 </html>
