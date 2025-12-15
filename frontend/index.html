@@ -48,7 +48,6 @@
         </div>
       </header>
 
-      <!-- Main layout -->
       <main class="layout">
         <!-- LEFT: calendar -->
         <section class="calendar-pane">
@@ -59,12 +58,11 @@
             </div>
 
             <div class="weekdays" aria-label="Weekdays">
-              <span>Mon</span><span>Tue</span><span>Wed</span> <span>Thu</span
-              ><span>Fri</span><span>Sat</span><span>Sun</span>
+              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
+              <span>Fri</span><span>Sat</span><span>Sun</span>
             </div>
           </div>
 
-          <!-- JS will dynamically render dates here -->
           <div
             class="calendar-grid"
             id="calendarGrid"
@@ -73,15 +71,16 @@
           ></div>
         </section>
 
-        <!-- Divider -->
         <div class="divider" aria-hidden="true"></div>
 
         <!-- RIGHT: drawer -->
         <aside class="drawer" id="entryDrawer" aria-label="Add Entry panel">
           <div class="drawer-top">
             <div>
-              <div class="drawer-kicker">Fleeting</div>
-              <h2 class="drawer-title">Add Entry</h2>
+              <div class="drawer-kicker" id="selectedDateKicker">
+                Select a day
+              </div>
+              <h2 class="drawer-title">Entries</h2>
             </div>
 
             <button
@@ -94,56 +93,50 @@
           </div>
 
           <div class="drawer-card">
-            <div class="drawer-toggle">
-              <div class="toggle-left">
-                <span class="radio"></span>
-                <div>
-                  <div class="toggle-title">Abony</div>
-                  <div class="toggle-sub">Entry journal</div>
-                </div>
-              </div>
-
-              <label class="switch" aria-label="Enable">
-                <input type="checkbox" checked />
-                <span class="slider"></span>
-              </label>
-            </div>
-
-            <div class="drawer-list">
-              <button class="drawer-item" type="button">
-                <span class="radio"></span>
-                <div class="item-body">
-                  <div class="item-title">Jun Latit</div>
-                  <div class="item-sub">Day</div>
-                  <div class="item-desc">Aim to publish a toe of 180…</div>
-                </div>
-                <span class="chev">›</span>
-              </button>
-
-              <button class="drawer-item" type="button">
-                <span class="radio"></span>
-                <div class="item-body">
-                  <div class="item-title">Accontry</div>
-                  <div class="item-sub">Entry</div>
-                  <div class="item-desc">
-                    Action set, all are you’re only you…
+            <!-- section: toggle -->
+            <div class="drawer-section">
+              <div class="drawer-toggle">
+                <div class="toggle-left">
+                  <div>
+                    <div class="toggle-title">Journal mode</div>
+                    <div class="toggle-sub">Show active entries</div>
                   </div>
                 </div>
-              </button>
 
-              <button class="drawer-item" type="button">
-                <span class="radio"></span>
-                <div class="item-body">
-                  <div class="item-title">Journal Entry’s</div>
-                  <div class="item-sub">New</div>
-                  <div class="item-desc">You mark your any full time the…</div>
+                <label class="switch" aria-label="Enable">
+                  <input type="checkbox" checked />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <!-- section: list -->
+            <div class="drawer-section">
+              <div class="drawer-section-head">
+                <span class="section-title">For this day</span>
+                <span class="section-sub" id="entryCountText">0 items</span>
+              </div>
+
+              <div class="drawer-list" id="entryList"></div>
+
+              <!-- empty state -->
+              <div class="empty-state" id="emptyState">
+                <div class="empty-title">No entries yet</div>
+                <div class="empty-sub">
+                  Tap “Add Entry” to write your first note for this day.
                 </div>
-              </button>
+              </div>
             </div>
 
-            <div class="drawer-footer">
-              <button id="newEntrybtn" class="pill-btn">+ Add Entry</button>
-            </div>
+            <!-- FAB -->
+            <button
+              id="newEntrybtn"
+              class="fab-btn"
+              type="button"
+              aria-label="Add Entry"
+            >
+              + Add Entry
+            </button>
           </div>
         </aside>
       </main>

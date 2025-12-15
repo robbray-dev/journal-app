@@ -4,6 +4,12 @@ const prevBtn = document.getElementById("previousMonthBtn");
 const nextBtn = document.getElementById("nextMonthBtn");
 const calendarGrid = document.getElementById("calendarGrid");
 
+const entryList = document.getElementById("entryList");
+const emptyState = document.getElementById("emptyState");
+const entryCountText = document.getElementById("entryCountText");
+const selectedDateKicker = document.getElementById("selectedDateKicker");
+const newEntryBtn = document.getElementById("newEntrybtn");
+
 const months = [
   "January",
   "February",
@@ -20,16 +26,23 @@ const months = [
 ];
 
 let current = new Date();
-let currentMonth = current.getMonth(); // 0-11
-let currentYear = current.getFullYear(); // yyyy
+let currentMonth = current.getMonth();
+let currentYear = current.getFullYear();
+
+// demo “entries exist” map (replace later with localStorage / backend)
+const entriesByDate = {
+  // "YYYY-MM-DD": [{title, type, desc}]
+  // Example:
+  // "2025-12-15": [{ title: "Gratitude", type: "Entry", desc: "Grateful for..." }]
+};
+
+let selectedISO = null;
 
 function fillSelects() {
-  // months
   monthSelect.innerHTML = months
     .map((m, i) => `<option value="${i}">${m}</option>`)
     .join("");
 
-  // years (range)
   const startYear = currentYear - 10;
   const endYear = currentYear + 10;
   yearSelect.innerHTML = Array.from(
@@ -47,29 +60,33 @@ function syncUI() {
   renderCalendar(currentYear, currentMonth);
 }
 
-// Monday-start helper: JS getDay() returns 0=Sun..6=Sat
-// We want 0=Mon..6=Sun
 function mondayIndex(jsDay) {
-  return (jsDay + 6) % 7;
+  return (jsDay + 6) % 7; // 0=Mon..6=Sun
 }
 
 function renderCalendar(year, monthIndex) {
-  calendarGrid.innerHTML = ""; // clear
+  calendarGrid.innerHTML = "";
 
-  // 1) figure out number of days in month
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-
-  // 2) figure out what weekday the 1st lands on (Mon-start)
   const firstDayJs = new Date(year, monthIndex, 1).getDay(); // 0=Sun..6=Sat
-  const offset = mondayIndex(firstDayJs); // 0..6 blanks before day 1
+  const offset = mondayIndex(firstDayJs);
 
-  // 3) total cells in grid (usually 35 or 42)
-  const totalCells = Math.ceil((offset + daysInMonth) / 7) * 7;
+  // ✅ remove trailing empty weeks:
+  // only render up to the last real day, but keep leading blanks for alignment
+  const usedCells = offset + daysInMonth;
+  const totalCells = Math.ceil(usedCells / 7) * 7;
 
-  // 4) build cells
+  const today = new Date();
+  const todayISO = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate()
+  )
+    .toISOString()
+    .slice(0, 10);
+
   for (let cell = 0; cell < totalCells; cell++) {
-    const dayNum = cell - offset + 1; // day number if in range
-
+    const dayNum = cell - offset + 1;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "cal-cell";
@@ -82,23 +99,87 @@ function renderCalendar(year, monthIndex) {
     } else {
       btn.textContent = String(dayNum);
 
-      // store ISO date for later (click -> open entries)
       const iso = new Date(year, monthIndex, dayNum).toISOString().slice(0, 10);
       btn.dataset.date = iso;
 
+      // today highlight
+      if (iso === todayISO) btn.classList.add("is-today");
+
+      // entry indicator
+      if (entriesByDate[iso]?.length) btn.classList.add("has-entry");
+
+      // selected highlight
+      if (selectedISO === iso) btn.classList.add("is-selected");
+
       btn.addEventListener("click", () => {
-        // placeholder: you’ll wire this to your “Add Entry” panel later
+        selectedISO = iso;
         document
           .querySelectorAll(".cal-cell.is-selected")
           .forEach((el) => el.classList.remove("is-selected"));
         btn.classList.add("is-selected");
-        console.log("Selected date:", iso);
+        renderRightPanelForDate(iso);
       });
     }
 
     calendarGrid.appendChild(btn);
   }
 }
+
+function renderRightPanelForDate(iso) {
+  selectedDateKicker.textContent = iso;
+  const items = entriesByDate[iso] || [];
+
+  entryList.innerHTML = "";
+  entryCountText.textContent = `${items.length} item${
+    items.length === 1 ? "" : "s"
+  }`;
+
+  if (items.length === 0) {
+    emptyState.style.display = "block";
+    return;
+  }
+
+  emptyState.style.display = "none";
+
+  items.forEach((it) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "drawer-item";
+
+    row.innerHTML = `
+      <div class="item-body">
+        <div class="item-title">${it.title}</div>
+        <div class="item-sub">${it.type}</div>
+        <div class="item-desc">${it.desc}</div>
+      </div>
+      <span class="chev">›</span>
+    `;
+
+    entryList.appendChild(row);
+  });
+}
+
+// quick add: creates a simple placeholder entry on selected day
+newEntryBtn.addEventListener("click", () => {
+  if (!selectedISO) {
+    // default to today if nothing selected
+    const t = new Date();
+    selectedISO = new Date(t.getFullYear(), t.getMonth(), t.getDate())
+      .toISOString()
+      .slice(0, 10);
+  }
+
+  entriesByDate[selectedISO] ||= [];
+  entriesByDate[selectedISO].push({
+    title: "New entry",
+    type: "Entry",
+    desc: "Write something you learned or appreciated today…",
+  });
+
+  // refresh UI
+  renderCalendar(currentYear, currentMonth);
+  renderRightPanelForDate(selectedISO);
+});
 
 function shiftMonth(delta) {
   currentMonth += delta;
@@ -113,11 +194,9 @@ function shiftMonth(delta) {
   syncUI();
 }
 
-// init
 fillSelects();
 syncUI();
 
-// events
 prevBtn.addEventListener("click", () => shiftMonth(-1));
 nextBtn.addEventListener("click", () => shiftMonth(1));
 
