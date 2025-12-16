@@ -12,39 +12,50 @@
     <div id="app">
       <!-- Top bar -->
       <header class="topbar" role="banner">
-        <button class="icon-btn ghost" aria-label="Menu">☰</button>
+        <div class="topbar-left">
+          <button class="icon-btn" aria-label="Menu">☰</button>
 
-        <div class="topbar-center">
-          <span class="topbar-title">Month</span>
-
-          <div class="nav-cluster" aria-label="Calendar navigation">
-            <button
-              id="previousMonthBtn"
-              class="icon-btn ghost"
-              aria-label="Previous month"
+          <div class="search-box">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="search-icon"
             >
-              ‹
-            </button>
-
-            <div class="pager" aria-hidden="true">
-              <span class="dot active"></span>
-              <span class="dot"></span>
-              <span class="dot"></span>
-            </div>
-
-            <button
-              id="nextMonthBtn"
-              class="icon-btn ghost"
-              aria-label="Next month"
-            >
-              ›
-            </button>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+              />
+            </svg>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search"
+              aria-label="Search entries"
+            />
           </div>
         </div>
 
         <div class="topbar-actions">
-          <button class="icon-btn ghost" aria-label="Search">🔍</button>
-          <button class="icon-btn ghost" aria-label="Profile">☺</button>
+          <button class="icon-btn" aria-label="Mood Tracker">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M16 7h6v6" />
+              <path d="m22 7-8.5 8.5-5-5L2 17" />
+            </svg>
+          </button>
         </div>
       </header>
 
@@ -71,46 +82,21 @@
           ></div>
         </section>
 
-        <div class="divider" aria-hidden="true"></div>
-
         <!-- RIGHT: drawer -->
-        <aside class="drawer" id="entryDrawer" aria-label="Add Entry panel">
+        <aside class="drawer" aria-label="Add Entry panel">
           <div class="drawer-top">
-            <div>
-              <div class="drawer-kicker" id="selectedDateKicker">
-                Select a day
+            <div class="drawer-header">
+              <div>
+                <div class="drawer-kicker" id="selectedDateKicker">
+                  Select a day
+                </div>
+                <h2 class="drawer-title">Entries</h2>
               </div>
-              <h2 class="drawer-title">Entries</h2>
             </div>
-
-            <button
-              class="icon-btn ghost"
-              id="closeDrawerBtn"
-              aria-label="Close"
-            >
-              ✕
-            </button>
           </div>
 
           <div class="drawer-card">
-            <!-- section: toggle -->
-            <div class="drawer-section">
-              <div class="drawer-toggle">
-                <div class="toggle-left">
-                  <div>
-                    <div class="toggle-title">Journal mode</div>
-                    <div class="toggle-sub">Show active entries</div>
-                  </div>
-                </div>
-
-                <label class="switch" aria-label="Enable">
-                  <input type="checkbox" checked />
-                  <span class="slider"></span>
-                </label>
-              </div>
-            </div>
-
-            <!-- section: list -->
+            <!-- List Section -->
             <div class="drawer-section">
               <div class="drawer-section-head">
                 <span class="section-title">For this day</span>
@@ -119,24 +105,25 @@
 
               <div class="drawer-list" id="entryList"></div>
 
-              <!-- empty state -->
+              <!-- Empty state -->
               <div class="empty-state" id="emptyState">
+                <div class="empty-icon">📝</div>
                 <div class="empty-title">No entries yet</div>
                 <div class="empty-sub">
-                  Tap “Add Entry” to write your first note for this day.
+                  Start journaling by creating your first entry for this day.
                 </div>
               </div>
-            </div>
 
-            <!-- FAB -->
-            <button
-              id="newEntrybtn"
-              class="fab-btn"
-              type="button"
-              aria-label="Add Entry"
-            >
-              + Add Entry
-            </button>
+              <!-- Add Button -->
+              <button
+                id="newEntrybtn"
+                class="fab-btn"
+                type="button"
+                aria-label="Add Entry"
+              >
+                + Add Entry
+              </button>
+            </div>
           </div>
         </aside>
       </main>
