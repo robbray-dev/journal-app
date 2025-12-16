@@ -506,7 +506,7 @@ body {
    Styles for authentication pages below
    ======================================== */
 
-body {
+body.auth-page {
   display: flex;
   align-items: center;
   justify-content: center;
