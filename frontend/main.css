@@ -13,9 +13,12 @@
   --accent-light: rgba(16, 185, 129, 0.08);
   --accent-border: rgba(16, 185, 129, 0.2);
 
+  --error: #ef4444;
+  --error-light: rgba(239, 68, 68, 0.1);
+
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.12);
 
   --radius-sm: 8px;
   --radius-md: 12px;
@@ -46,6 +49,11 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ========================================
+   JOURNAL PAGE STYLES (index.html)
+   Paste updated styles from previous main.css below
+   ======================================== */
 
 #app {
   max-width: 1200px;
@@ -489,6 +497,291 @@ body {
   }
 
   .drawer-title {
+    font-size: 24px;
+  }
+}
+
+/* ========================================
+   AUTH PAGE STYLES (auth.html)
+   Styles for authentication pages below
+   ======================================== */
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--spacing-unit) * 3);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 420px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: calc(var(--spacing-unit) * 4);
+}
+
+.auth-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 0 0 calc(var(--spacing-unit) * 1);
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  font-size: 15px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.auth-card {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-lg);
+  padding: calc(var(--spacing-unit) * 4);
+}
+
+.tabs {
+  display: flex;
+  gap: calc(var(--spacing-unit) * 1);
+  background: var(--soft);
+  border-radius: var(--radius-md);
+  padding: calc(var(--spacing-unit) * 0.5);
+  margin-bottom: calc(var(--spacing-unit) * 3);
+}
+
+.tab {
+  flex: 1;
+  padding: calc(var(--spacing-unit) * 1.5);
+  border: none;
+  background: transparent;
+  border-radius: calc(var(--radius-md) - 4px);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--card);
+  color: var(--text-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-group {
+  margin-bottom: calc(var(--spacing-unit) * 2.5);
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-strong);
+  margin-bottom: calc(var(--spacing-unit) * 1);
+}
+
+.form-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 calc(var(--spacing-unit) * 2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  font-size: 15px;
+  color: var(--text);
+  font-family: var(--font);
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.form-input:hover {
+  border-color: var(--muted-light);
+}
+
+.form-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+  background: var(--card);
+}
+
+.form-input::placeholder {
+  color: var(--muted-light);
+}
+
+.form-input.error {
+  border-color: var(--error);
+}
+
+.form-input.error:focus {
+  box-shadow: 0 0 0 3px var(--error-light);
+}
+
+.error-message {
+  display: none;
+  margin-top: calc(var(--spacing-unit) * 1);
+  font-size: 13px;
+  color: var(--error);
+}
+
+.error-message.show {
+  display: block;
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: calc(var(--spacing-unit) * 1);
+}
+
+.forgot-password a {
+  font-size: 13px;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  margin-top: calc(var(--spacing-unit) * 1);
+}
+
+.submit-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--spacing-unit) * 2);
+  margin: calc(var(--spacing-unit) * 3) 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
+
+.social-btn {
+  width: 100%;
+  height: 48px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing-unit) * 1.5);
+  margin-bottom: calc(var(--spacing-unit) * 1.5);
+}
+
+.social-btn:hover {
+  background: var(--soft);
+  border-color: var(--muted-light);
+}
+
+.social-btn:active {
+  transform: scale(0.98);
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: calc(var(--spacing-unit) * 3);
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.auth-footer a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.success-message {
+  padding: calc(var(--spacing-unit) * 2);
+  background: var(--accent-light);
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius-md);
+  color: var(--accent-hover);
+  font-size: 14px;
+  margin-bottom: calc(var(--spacing-unit) * 2);
+  display: none;
+}
+
+.success-message.show {
+  display: block;
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: calc(var(--spacing-unit) * 2);
+  }
+
+  .auth-card {
+    padding: calc(var(--spacing-unit) * 3);
+  }
+
+  .auth-title {
     font-size: 24px;
   }
 }

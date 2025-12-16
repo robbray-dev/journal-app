@@ -1,3 +1,8 @@
+// ========================================
+// JOURNAL PAGE LOGIC (index.html)
+// Paste updated logic from previous app.js below
+// ========================================
+
 const monthSelect = document.getElementById("monthSelect");
 const yearSelect = document.getElementById("yearSelect");
 const calendarGrid = document.getElementById("calendarGrid");
@@ -210,3 +215,171 @@ yearSelect.addEventListener("change", (e) => {
   currentYear = Number(e.target.value);
   syncUI();
 });
+
+// ========================================
+// AUTH PAGE LOGIC (auth.html)
+// Authentication form handling below
+// ========================================
+
+// Tab switching
+const tabs = document.querySelectorAll(".tab");
+const tabContents = document.querySelectorAll(".tab-content");
+
+if (tabs.length > 0) {
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const targetTab = tab.dataset.tab;
+
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+
+      tabContents.forEach((content) => {
+        content.classList.remove("active");
+        if (content.id === `${targetTab}-content`) {
+          content.classList.add("active");
+        }
+      });
+
+      // Clear any messages when switching tabs
+      const successMessage = document.getElementById("successMessage");
+      if (successMessage) {
+        successMessage.classList.remove("show");
+      }
+    });
+  });
+}
+
+// Login form submission
+const loginForm = document.getElementById("loginForm");
+if (loginForm) {
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("login-email").value;
+    const password = document.getElementById("login-password").value;
+
+    // Clear previous errors
+    clearErrors("login");
+
+    try {
+      // TODO: Add your Supabase login logic here
+      // const { data, error } = await supabase.auth.signInWithPassword({
+      //   email: email,
+      //   password: password,
+      // });
+
+      // if (error) throw error;
+
+      // For demo purposes:
+      console.log("Login attempt:", { email, password });
+      showSuccess("Successfully signed in! Redirecting...");
+
+      // Redirect to main app after successful login
+      // setTimeout(() => {
+      //   window.location.href = 'index.html';
+      // }, 1500);
+    } catch (error) {
+      showError("login-password", error.message || "Invalid email or password");
+    }
+  });
+}
+
+// Signup form submission
+const signupForm = document.getElementById("signupForm");
+if (signupForm) {
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("signup-email").value;
+    const password = document.getElementById("signup-password").value;
+    const confirmPassword = document.getElementById(
+      "signup-confirm-password"
+    ).value;
+
+    // Clear previous errors
+    clearErrors("signup");
+
+    // Basic validation
+    if (password.length < 8) {
+      showError("signup-password", "Password must be at least 8 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      showError("signup-confirm-password", "Passwords do not match");
+      return;
+    }
+
+    try {
+      // TODO: Add your Supabase signup logic here
+      // const { data, error } = await supabase.auth.signUp({
+      //   email: email,
+      //   password: password,
+      // });
+
+      // if (error) throw error;
+
+      // For demo purposes:
+      console.log("Signup attempt:", { email, password });
+      showSuccess(
+        "Account created! Please check your email to verify your account."
+      );
+    } catch (error) {
+      showError("signup-email", error.message || "Failed to create account");
+    }
+  });
+}
+
+// Forgot password link
+const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+if (forgotPasswordLink) {
+  forgotPasswordLink.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("login-email").value;
+
+    if (!email) {
+      showError("login-email", "Please enter your email address");
+      return;
+    }
+
+    // TODO: Add your Supabase password reset logic here
+    // const { data, error } = await supabase.auth.resetPasswordForEmail(email);
+
+    console.log("Password reset requested for:", email);
+    showSuccess("Password reset link sent to your email!");
+  });
+}
+
+// Helper functions
+function showError(fieldId, message) {
+  const input = document.getElementById(fieldId);
+  const errorDiv = document.getElementById(`${fieldId}-error`);
+
+  if (input && errorDiv) {
+    input.classList.add("error");
+    errorDiv.textContent = message;
+    errorDiv.classList.add("show");
+  }
+}
+
+function clearErrors(formType) {
+  const inputs = document.querySelectorAll(`#${formType}-content .form-input`);
+  const errors = document.querySelectorAll(
+    `#${formType}-content .error-message`
+  );
+
+  inputs.forEach((input) => input.classList.remove("error"));
+  errors.forEach((error) => {
+    error.classList.remove("show");
+    error.textContent = "";
+  });
+}
+
+function showSuccess(message) {
+  const successDiv = document.getElementById("successMessage");
+  if (successDiv) {
+    successDiv.textContent = message;
+    successDiv.classList.add("show");
+  }
+}
