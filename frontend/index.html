@@ -3,130 +3,116 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Journal Web App</title>
+    <title>My Journal - Sign In</title>
     <link rel="stylesheet" href="main.css" />
-    <meta name="author" content="Robert Bray" />
   </head>
 
-  <body>
-    <div id="app">
-      <!-- Top bar -->
-      <header class="topbar" role="banner">
-        <div class="topbar-left">
-          <button class="icon-btn" aria-label="Menu">☰</button>
+  <body class="auth-page">
+    <div class="auth-container">
+      <div class="auth-header">
+        <h1 class="auth-title">My Journal</h1>
+        <p class="auth-subtitle">Your personal space for reflection</p>
+      </div>
 
-          <div class="search-box">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="1.5"
-              stroke="currentColor"
-              class="search-icon"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+      <div class="auth-card">
+        <div class="tabs">
+          <button class="tab active" data-tab="login">Sign In</button>
+          <button class="tab" data-tab="signup">Sign Up</button>
+        </div>
+
+        <div class="success-message" id="successMessage"></div>
+
+        <!-- Login Form -->
+        <div class="tab-content active" id="login-content">
+          <!-- This will be loaded from sign_form.html or you can paste it here -->
+          <form id="loginForm">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email</label>
+              <input
+                type="email"
+                id="login-email"
+                class="form-input"
+                placeholder="Email"
+                required
               />
-            </svg>
-            <input
-              type="text"
-              class="search-input"
-              placeholder="Search"
-              aria-label="Search entries"
-            />
-          </div>
+              <div class="error-message" id="login-email-error"></div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <input
+                type="password"
+                id="login-password"
+                class="form-input"
+                placeholder="Password"
+                required
+              />
+              <div class="error-message" id="login-password-error"></div>
+              <div class="forgot-password">
+                <a href="#" id="forgotPasswordLink">Forgot password?</a>
+              </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Sign In</button>
+          </form>
         </div>
 
-        <div class="topbar-actions">
-          <button class="icon-btn" aria-label="Mood Tracker">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M16 7h6v6" />
-              <path d="m22 7-8.5 8.5-5-5L2 17" />
-            </svg>
-          </button>
-        </div>
-      </header>
-
-      <main class="layout">
-        <!-- LEFT: calendar -->
-        <section class="calendar-pane">
-          <div class="calendar-head">
-            <div class="calendar-row">
-              <select id="monthSelect" class="select"></select>
-              <select id="yearSelect" class="select"></select>
+        <!-- Signup Form -->
+        <div class="tab-content" id="signup-content">
+          <!-- This will be loaded from signup_form.html or you can paste it here -->
+          <form id="signupForm">
+            <div class="form-group">
+              <label class="form-label" for="signup-email">Email</label>
+              <input
+                type="email"
+                id="signup-email"
+                class="form-input"
+                placeholder="Email"
+                required
+              />
+              <div class="error-message" id="signup-email-error"></div>
             </div>
 
-            <div class="weekdays" aria-label="Weekdays">
-              <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
-              <span>Fri</span><span>Sat</span><span>Sun</span>
+            <div class="form-group">
+              <label class="form-label" for="signup-password">Password</label>
+              <input
+                type="password"
+                id="signup-password"
+                class="form-input"
+                placeholder="Password"
+                required
+                minlength="8"
+              />
+              <div class="error-message" id="signup-password-error"></div>
             </div>
-          </div>
 
-          <div
-            class="calendar-grid"
-            id="calendarGrid"
-            role="grid"
-            aria-label="Monthly calendar"
-          ></div>
-        </section>
-
-        <!-- RIGHT: drawer -->
-        <aside class="drawer" aria-label="Add Entry panel">
-          <div class="drawer-top">
-            <div class="drawer-header">
-              <div>
-                <div class="drawer-kicker" id="selectedDateKicker">
-                  Select a day
-                </div>
-                <h2 class="drawer-title">Entries</h2>
-              </div>
-            </div>
-          </div>
-
-          <div class="drawer-card">
-            <!-- List Section -->
-            <div class="drawer-section">
-              <div class="drawer-section-head">
-                <span class="section-title">For this day</span>
-                <span class="section-sub" id="entryCountText">0 items</span>
-              </div>
-
-              <div class="drawer-list" id="entryList"></div>
-
-              <!-- Empty state -->
-              <div class="empty-state" id="emptyState">
-                <div class="empty-icon">📝</div>
-                <div class="empty-title">No entries yet</div>
-                <div class="empty-sub">
-                  Start journaling by creating your first entry for this day.
-                </div>
-              </div>
-
-              <!-- Add Button -->
-              <button
-                id="newEntrybtn"
-                class="fab-btn"
-                type="button"
-                aria-label="Add Entry"
+            <div class="form-group">
+              <label class="form-label" for="signup-confirm-password"
+                >Confirm Password</label
               >
-                + Add Entry
-              </button>
+              <input
+                type="password"
+                id="signup-confirm-password"
+                class="form-input"
+                placeholder="Confirm Password"
+                required
+                minlength="8"
+              />
+              <div
+                class="error-message"
+                id="signup-confirm-password-error"
+              ></div>
             </div>
-          </div>
-        </aside>
-      </main>
+
+            <button type="submit" class="submit-btn">Create Account</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="auth-footer">
+        By continuing, you agree to our <a href="#">Terms</a> and
+        <a href="#">Privacy Policy</a>
+      </div>
     </div>
 
     <script src="app.js"></script>
