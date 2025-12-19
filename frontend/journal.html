@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Journal Web App</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="main.css" />
     <meta name="author" content="Robert Bray" />
   </head>
@@ -128,7 +129,72 @@
         </aside>
       </main>
     </div>
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Add New Entry</h2>
+          <button class="modal-close" id="closeModalBtn" aria-label="Close">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M18 6L6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
+        <form id="entryForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label" for="entry-title">Title</label>
+              <input
+                type="text"
+                id="entry-title"
+                class="form-input"
+                placeholder="Give your entry a title"
+                required
+              />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="entry-did"
+                >What you did today</label
+              >
+              <textarea
+                id="entry-did"
+                class="form-textarea"
+                placeholder="Describe what you did today..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="entry-learned"
+                >What you learned today</label
+              >
+              <textarea
+                id="entry-learned"
+                class="form-textarea"
+                placeholder="Share what you learned or discovered..."
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="cancelBtn">
+              Cancel
+            </button>
+            <button type="submit" class="btn btn-primary">Save Entry</button>
+          </div>
+        </form>
+      </div>
+    </div>
     <script src="app.js"></script>
   </body>
 </html>

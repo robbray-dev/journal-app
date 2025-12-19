@@ -1,230 +1,322 @@
 // ========================================
-// JOURNAL PAGE LOGIC (index.html)
-// Paste updated logic from previous app.js below
+// SUPABASE INITIALIZATION
+// ========================================
+
+const SUPABASE_URL = my_url;
+const SUPABASE_ANON_KEY = my_anon_key;
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+// ========================================
+// AUTH CHECK (for journal.html)
+// ========================================
+
+if (document.getElementById("calendarGrid")) {
+  // This is the journal page - check auth
+  const checkAuth = async () => {
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+      // User not logged in, redirect to login page
+      window.location.href = "index.html";
+    } else {
+      console.log("User authenticated:", session.user.email);
+    }
+  };
+
+  checkAuth();
+}
+
+// ========================================
+// JOURNAL PAGE LOGIC (journal.html)
+// Only runs if journal elements exist
 // ========================================
 
 const monthSelect = document.getElementById("monthSelect");
 const yearSelect = document.getElementById("yearSelect");
 const calendarGrid = document.getElementById("calendarGrid");
-
 const entryList = document.getElementById("entryList");
 const emptyState = document.getElementById("emptyState");
 const entryCountText = document.getElementById("entryCountText");
 const selectedDateKicker = document.getElementById("selectedDateKicker");
 const newEntryBtn = document.getElementById("newEntrybtn");
 
-const months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+// Only run journal code if we're on the journal page
+if (calendarGrid) {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-let current = new Date();
-let currentMonth = current.getMonth();
-let currentYear = current.getFullYear();
+  let current = new Date();
+  let currentMonth = current.getMonth();
+  let currentYear = current.getFullYear();
 
-const entriesByDate = {
-  // Demo data - add some sample entries
-  "2025-12-16": [
-    {
-      title: "Morning reflection",
-      type: "Entry",
-      desc: "Started the day with meditation and coffee. Feeling grateful for the small moments.",
-    },
-  ],
-};
+  const entriesByDate = {
+    "2025-12-16": [
+      {
+        title: "Morning reflection",
+        type: "Entry",
+        desc: "Started the day with meditation and coffee. Feeling grateful for the small moments.",
+      },
+    ],
+  };
 
-let selectedISO = null;
+  let selectedISO = null;
 
-function fillSelects() {
-  monthSelect.innerHTML = months
-    .map((m, i) => `<option value="${i}">${m}</option>`)
-    .join("");
+  function fillSelects() {
+    monthSelect.innerHTML = months
+      .map((m, i) => `<option value="${i}">${m}</option>`)
+      .join("");
 
-  const startYear = currentYear - 10;
-  const endYear = currentYear + 10;
-  yearSelect.innerHTML = Array.from(
-    { length: endYear - startYear + 1 },
-    (_, idx) => {
-      const y = startYear + idx;
-      return `<option value="${y}">${y}</option>`;
-    }
-  ).join("");
-}
-
-function syncUI() {
-  monthSelect.value = String(currentMonth);
-  yearSelect.value = String(currentYear);
-  renderCalendar(currentYear, currentMonth);
-}
-
-function mondayIndex(jsDay) {
-  return (jsDay + 6) % 7;
-}
-
-function formatDate(iso) {
-  const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function renderCalendar(year, monthIndex) {
-  calendarGrid.innerHTML = "";
-
-  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
-  const firstDayJs = new Date(year, monthIndex, 1).getDay();
-  const offset = mondayIndex(firstDayJs);
-
-  const usedCells = offset + daysInMonth;
-  const totalCells = Math.ceil(usedCells / 7) * 7;
-
-  const today = new Date();
-  const todayISO = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  )
-    .toISOString()
-    .slice(0, 10);
-
-  for (let cell = 0; cell < totalCells; cell++) {
-    const dayNum = cell - offset + 1;
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "cal-cell";
-    btn.setAttribute("role", "gridcell");
-
-    if (dayNum < 1 || dayNum > daysInMonth) {
-      btn.classList.add("is-empty");
-      btn.disabled = true;
-      btn.textContent = "";
-    } else {
-      btn.textContent = String(dayNum);
-
-      const iso = new Date(year, monthIndex, dayNum).toISOString().slice(0, 10);
-      btn.dataset.date = iso;
-
-      if (iso === todayISO) btn.classList.add("is-today");
-      if (entriesByDate[iso]?.length) btn.classList.add("has-entry");
-      if (selectedISO === iso) btn.classList.add("is-selected");
-
-      btn.addEventListener("click", () => {
-        selectedISO = iso;
-        document
-          .querySelectorAll(".cal-cell.is-selected")
-          .forEach((el) => el.classList.remove("is-selected"));
-        btn.classList.add("is-selected");
-        renderRightPanelForDate(iso);
-      });
-    }
-
-    calendarGrid.appendChild(btn);
-  }
-}
-
-function renderRightPanelForDate(iso) {
-  selectedDateKicker.textContent = formatDate(iso);
-  const items = entriesByDate[iso] || [];
-
-  entryList.innerHTML = "";
-  entryCountText.textContent = `${items.length} item${
-    items.length === 1 ? "" : "s"
-  }`;
-
-  if (items.length === 0) {
-    emptyState.style.display = "block";
-    entryList.style.display = "none";
-    return;
+    const startYear = currentYear - 10;
+    const endYear = currentYear + 10;
+    yearSelect.innerHTML = Array.from(
+      { length: endYear - startYear + 1 },
+      (_, idx) => {
+        const y = startYear + idx;
+        return `<option value="${y}">${y}</option>`;
+      }
+    ).join("");
   }
 
-  emptyState.style.display = "none";
-  entryList.style.display = "flex";
+  function syncUI() {
+    monthSelect.value = String(currentMonth);
+    yearSelect.value = String(currentYear);
+    renderCalendar(currentYear, currentMonth);
+  }
 
-  items.forEach((it) => {
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "drawer-item";
+  function mondayIndex(jsDay) {
+    return (jsDay + 6) % 7;
+  }
 
-    row.innerHTML = `
-      <div class="item-body">
-        <div class="item-title">${it.title}</div>
-        <div class="item-sub">${it.type}</div>
-        <div class="item-desc">${it.desc}</div>
-      </div>
-      <span class="chev">›</span>
-    `;
+  function formatDate(iso) {
+    const d = new Date(iso + "T00:00:00");
+    return d.toLocaleDateString("en-US", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  }
 
-    entryList.appendChild(row);
-  });
-}
+  function renderCalendar(year, monthIndex) {
+    calendarGrid.innerHTML = "";
 
-newEntryBtn.addEventListener("click", () => {
-  if (!selectedISO) {
-    const t = new Date();
-    selectedISO = new Date(t.getFullYear(), t.getMonth(), t.getDate())
+    const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+    const firstDayJs = new Date(year, monthIndex, 1).getDay();
+    const offset = mondayIndex(firstDayJs);
+
+    const usedCells = offset + daysInMonth;
+    const totalCells = Math.ceil(usedCells / 7) * 7;
+
+    const today = new Date();
+    const todayISO = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    )
       .toISOString()
       .slice(0, 10);
+
+    for (let cell = 0; cell < totalCells; cell++) {
+      const dayNum = cell - offset + 1;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "cal-cell";
+      btn.setAttribute("role", "gridcell");
+
+      if (dayNum < 1 || dayNum > daysInMonth) {
+        btn.classList.add("is-empty");
+        btn.disabled = true;
+        btn.textContent = "";
+      } else {
+        btn.textContent = String(dayNum);
+
+        const iso = new Date(year, monthIndex, dayNum)
+          .toISOString()
+          .slice(0, 10);
+        btn.dataset.date = iso;
+
+        if (iso === todayISO) btn.classList.add("is-today");
+        if (entriesByDate[iso]?.length) btn.classList.add("has-entry");
+        if (selectedISO === iso) btn.classList.add("is-selected");
+
+        btn.addEventListener("click", () => {
+          selectedISO = iso;
+          document
+            .querySelectorAll(".cal-cell.is-selected")
+            .forEach((el) => el.classList.remove("is-selected"));
+          btn.classList.add("is-selected");
+          renderRightPanelForDate(iso);
+        });
+      }
+
+      calendarGrid.appendChild(btn);
+    }
   }
 
-  entriesByDate[selectedISO] ||= [];
-  entriesByDate[selectedISO].push({
-    title: "New entry",
-    type: "Entry",
-    desc: "Write something you learned or appreciated today…",
+  function renderRightPanelForDate(iso) {
+    selectedDateKicker.textContent = formatDate(iso);
+    const items = entriesByDate[iso] || [];
+
+    entryList.innerHTML = "";
+    entryCountText.textContent = `${items.length} item${
+      items.length === 1 ? "" : "s"
+    }`;
+
+    if (items.length === 0) {
+      emptyState.style.display = "block";
+      entryList.style.display = "none";
+      return;
+    }
+
+    emptyState.style.display = "none";
+    entryList.style.display = "flex";
+
+    items.forEach((it) => {
+      const row = document.createElement("button");
+      row.type = "button";
+      row.className = "drawer-item";
+
+      row.innerHTML = `
+        <div class="item-body">
+          <div class="item-title">${it.title}</div>
+          <div class="item-sub">${it.type}</div>
+          <div class="item-desc">${it.desc}</div>
+        </div>
+        <span class="chev">›</span>
+      `;
+
+      entryList.appendChild(row);
+    });
+  }
+
+  function shiftMonth(delta) {
+    currentMonth += delta;
+    if (currentMonth < 0) {
+      currentMonth = 11;
+      currentYear -= 1;
+    }
+    if (currentMonth > 11) {
+      currentMonth = 0;
+      currentYear += 1;
+    }
+    syncUI();
+  }
+
+  // Modal elements
+  const modalOverlay = document.getElementById("modalOverlay");
+  const closeModalBtn = document.getElementById("closeModalBtn");
+  const cancelBtn = document.getElementById("cancelBtn");
+  const entryForm = document.getElementById("entryForm");
+
+  // Open modal when clicking "+ Add Entry"
+  if (newEntryBtn) {
+    newEntryBtn.addEventListener("click", () => {
+      modalOverlay.classList.add("show");
+      document.body.style.overflow = "hidden";
+    });
+  }
+
+  // Close modal function
+  function closeModal() {
+    if (modalOverlay) {
+      modalOverlay.classList.remove("show");
+      document.body.style.overflow = "";
+      if (entryForm) entryForm.reset();
+    }
+  }
+
+  // Close modal buttons
+  if (closeModalBtn) closeModalBtn.addEventListener("click", closeModal);
+  if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+
+  // Close on overlay click
+  if (modalOverlay) {
+    modalOverlay.addEventListener("click", (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+  }
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (
+      e.key === "Escape" &&
+      modalOverlay &&
+      modalOverlay.classList.contains("show")
+    ) {
+      closeModal();
+    }
   });
 
-  renderCalendar(currentYear, currentMonth);
-  renderRightPanelForDate(selectedISO);
-});
+  // Handle form submission
+  if (entryForm) {
+    entryForm.addEventListener("submit", (e) => {
+      e.preventDefault();
 
-function shiftMonth(delta) {
-  currentMonth += delta;
-  if (currentMonth < 0) {
-    currentMonth = 11;
-    currentYear -= 1;
+      if (!selectedISO) {
+        const t = new Date();
+        selectedISO = new Date(t.getFullYear(), t.getMonth(), t.getDate())
+          .toISOString()
+          .slice(0, 10);
+      }
+
+      const title = document.getElementById("entry-title").value;
+      const did = document.getElementById("entry-did").value;
+      const learned = document.getElementById("entry-learned").value;
+
+      entriesByDate[selectedISO] ||= [];
+      entriesByDate[selectedISO].push({
+        title: title,
+        type: "Entry",
+        desc: `Did: ${did} | Learned: ${learned}`,
+      });
+
+      renderCalendar(currentYear, currentMonth);
+      renderRightPanelForDate(selectedISO);
+      closeModal();
+    });
   }
-  if (currentMonth > 11) {
-    currentMonth = 0;
-    currentYear += 1;
-  }
+
+  // Initialize calendar
+  fillSelects();
   syncUI();
+
+  monthSelect.addEventListener("change", (e) => {
+    currentMonth = Number(e.target.value);
+    syncUI();
+  });
+
+  yearSelect.addEventListener("change", (e) => {
+    currentYear = Number(e.target.value);
+    syncUI();
+  });
 }
 
-fillSelects();
-syncUI();
-
-monthSelect.addEventListener("change", (e) => {
-  currentMonth = Number(e.target.value);
-  syncUI();
-});
-
-yearSelect.addEventListener("change", (e) => {
-  currentYear = Number(e.target.value);
-  syncUI();
-});
-
 // ========================================
-// AUTH PAGE LOGIC (auth.html)
-// Authentication form handling below
+// AUTH PAGE LOGIC (index.html)
+// Only runs if auth elements exist
 // ========================================
 
-// Tab switching
 const tabs = document.querySelectorAll(".tab");
 const tabContents = document.querySelectorAll(".tab-content");
 
+// Tab switching
 if (tabs.length > 0) {
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
@@ -240,7 +332,6 @@ if (tabs.length > 0) {
         }
       });
 
-      // Clear any messages when switching tabs
       const successMessage = document.getElementById("successMessage");
       if (successMessage) {
         successMessage.classList.remove("show");
@@ -249,7 +340,7 @@ if (tabs.length > 0) {
   });
 }
 
-// Login form submission
+// Login form
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
@@ -258,33 +349,29 @@ if (loginForm) {
     const email = document.getElementById("login-email").value;
     const password = document.getElementById("login-password").value;
 
-    // Clear previous errors
     clearErrors("login");
 
     try {
-      // TODO: Add your Supabase login logic here
-      // const { data, error } = await supabase.auth.signInWithPassword({
-      //   email: email,
-      //   password: password,
-      // });
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
 
-      // if (error) throw error;
+      if (error) throw error;
 
-      // For demo purposes:
-      console.log("Login attempt:", { email, password });
+      console.log("Login successful:", data);
       showSuccess("Successfully signed in! Redirecting...");
 
-      // Redirect to main app after successful login
-      // setTimeout(() => {
-      //   window.location.href = 'index.html';
-      // }, 1500);
+      setTimeout(() => {
+        window.location.href = "journal.html";
+      }, 1500);
     } catch (error) {
       showError("login-password", error.message || "Invalid email or password");
     }
   });
 }
 
-// Signup form submission
+// Signup form
 const signupForm = document.getElementById("signupForm");
 if (signupForm) {
   signupForm.addEventListener("submit", async (e) => {
@@ -296,10 +383,8 @@ if (signupForm) {
       "signup-confirm-password"
     ).value;
 
-    // Clear previous errors
     clearErrors("signup");
 
-    // Basic validation
     if (password.length < 8) {
       showError("signup-password", "Password must be at least 8 characters");
       return;
@@ -311,19 +396,15 @@ if (signupForm) {
     }
 
     try {
-      // TODO: Add your Supabase signup logic here
-      // const { data, error } = await supabase.auth.signUp({
-      //   email: email,
-      //   password: password,
-      // });
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+      });
 
-      // if (error) throw error;
+      if (error) throw error;
 
-      // For demo purposes:
-      console.log("Signup attempt:", { email, password });
-      showSuccess(
-        "Account created! Please check your email to verify your account."
-      );
+      console.log("Signup successful:", data);
+      showSuccess("Account created!");
     } catch (error) {
       showError("signup-email", error.message || "Failed to create account");
     }
@@ -335,19 +416,7 @@ const forgotPasswordLink = document.getElementById("forgotPasswordLink");
 if (forgotPasswordLink) {
   forgotPasswordLink.addEventListener("click", (e) => {
     e.preventDefault();
-
-    const email = document.getElementById("login-email").value;
-
-    if (!email) {
-      showError("login-email", "Please enter your email address");
-      return;
-    }
-
-    // TODO: Add your Supabase password reset logic here
-    // const { data, error } = await supabase.auth.resetPasswordForEmail(email);
-
-    console.log("Password reset requested for:", email);
-    showSuccess("Password reset link sent to your email!");
+    window.location.href = "forgot-password.html";
   });
 }
 
