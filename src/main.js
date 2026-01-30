@@ -2,11 +2,11 @@
 // SUPABASE INITIALIZATION
 // ========================================
 
-const SUPABASE_URL = my_url;
-const SUPABASE_ANON_KEY = my_anon_key;
+const SUPABASE_URL = import.meta.env.VITE_PROJECT_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_PUBLIC_ANON_KEY;
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_ANON_KEY
+  SUPABASE_ANON_KEY,
 );
 
 // ========================================
@@ -44,6 +44,14 @@ const emptyState = document.getElementById("emptyState");
 const entryCountText = document.getElementById("entryCountText");
 const selectedDateKicker = document.getElementById("selectedDateKicker");
 const newEntryBtn = document.getElementById("newEntrybtn");
+const menuBtn = document.getElementById("menuBtn");
+const sideMenu = document.getElementById("sideMenu");
+
+if (menuBtn && sideMenu) {
+  menuBtn.addEventListener("click", () => {
+    sideMenu.classList.toggle("open");
+  });
+}
 
 // Only run journal code if we're on the journal page
 if (calendarGrid) {
@@ -90,7 +98,7 @@ if (calendarGrid) {
       (_, idx) => {
         const y = startYear + idx;
         return `<option value="${y}">${y}</option>`;
-      }
+      },
     ).join("");
   }
 
@@ -128,7 +136,7 @@ if (calendarGrid) {
     const todayISO = new Date(
       today.getFullYear(),
       today.getMonth(),
-      today.getDate()
+      today.getDate(),
     )
       .toISOString()
       .slice(0, 10);
@@ -266,7 +274,7 @@ if (calendarGrid) {
 
   // Handle form submission
   if (entryForm) {
-    entryForm.addEventListener("submit", (e) => {
+    entryForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       if (!selectedISO) {
@@ -280,16 +288,68 @@ if (calendarGrid) {
       const did = document.getElementById("entry-did").value;
       const learned = document.getElementById("entry-learned").value;
 
-      entriesByDate[selectedISO] ||= [];
-      entriesByDate[selectedISO].push({
+      // Prepare entry data for Spring Boot API
+      const entryData = {
         title: title,
-        type: "Entry",
-        desc: `Did: ${did} | Learned: ${learned}`,
-      });
+        entryDate: selectedISO,
+        what_did: did,
+        what_learned: learned,
+      };
 
-      renderCalendar(currentYear, currentMonth);
-      renderRightPanelForDate(selectedISO);
-      closeModal();
+      try {
+        // Get Supabase session token
+        const {
+          data: { session },
+        } = await supabaseClient.auth.getSession();
+
+        // ADD THESE DEBUG LINES HERE ⬇️
+        console.log("Sending token:", session.access_token);
+        console.log(
+          "Token starts with:",
+          session.access_token.substring(0, 50),
+        );
+        // ⬆️ ADD THESE DEBUG LINES HERE
+
+        if (!session) {
+          alert("Not authenticated!");
+          window.location.href = "index.html";
+          return;
+        }
+
+        // Call Spring Boot API
+        const response = await fetch("http://localhost:8080/api/v1/entries", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`, // Send Supabase JWT
+          },
+          body: JSON.stringify(entryData),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const savedEntry = await response.json();
+        console.log("Entry saved:", savedEntry);
+
+        // Update local data (temporary - you should fetch from API instead)
+        entriesByDate[selectedISO] ||= [];
+        entriesByDate[selectedISO].push({
+          title: title,
+          type: "Entry",
+          desc: `Did: ${did} | Learned: ${learned}`,
+        });
+
+        renderCalendar(currentYear, currentMonth);
+        renderRightPanelForDate(selectedISO);
+        closeModal();
+
+        alert("Entry saved successfully!");
+      } catch (error) {
+        console.error("Error saving entry:", error);
+        alert("Failed to save entry: " + error.message);
+      }
     });
   }
 
@@ -305,6 +365,85 @@ if (calendarGrid) {
   yearSelect.addEventListener("change", (e) => {
     currentYear = Number(e.target.value);
     syncUI();
+  });
+}
+
+// ========================================
+// ENTRIES PAGE LOGIC (entries.html)
+// Only runs if entriesGrid exists
+// ========================================
+
+const entriesGrid = document.getElementById("entriesGrid");
+
+if (entriesGrid) {
+  loadEntries();
+}
+
+async function loadEntries() {
+  try {
+    const {
+      data: { session },
+    } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    const response = await fetch("http://localhost:8080/api/v1/entries", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const entries = await response.json();
+    renderEntries(entries);
+  } catch (err) {
+    console.error("Failed to load entries:", err);
+  }
+}
+
+function renderEntries(entries) {
+  entriesGrid.innerHTML = "";
+
+  if (entries.length === 0) {
+    entriesGrid.innerHTML = "<p>No entries yet.</p>";
+    return;
+  }
+
+  entries.forEach((entry) => {
+    const card = document.createElement("div");
+    card.className = "entry-card";
+
+    card.innerHTML = `
+      <div class="entry-header">
+        <div class="entry-date">
+          <span class="date-badge">
+            ${new Date(entry.entryDate).toLocaleDateString()}
+          </span>
+        </div>
+        <button class="entry-menu">⋮</button>
+      </div>
+
+      <h3 class="entry-title">${entry.title}</h3>
+
+      <div class="entry-section">
+        <div class="entry-label">What I Did</div>
+        <div class="entry-text">${entry.what_did}</div>
+      </div>
+
+      <div class="entry-section">
+        <div class="entry-label">What I Learned</div>
+        <div class="entry-text">${entry.what_learned}</div>
+      </div>
+    `;
+
+    entriesGrid.appendChild(card);
   });
 }
 
@@ -380,7 +519,7 @@ if (signupForm) {
     const email = document.getElementById("signup-email").value;
     const password = document.getElementById("signup-password").value;
     const confirmPassword = document.getElementById(
-      "signup-confirm-password"
+      "signup-confirm-password",
     ).value;
 
     clearErrors("signup");
@@ -435,7 +574,7 @@ function showError(fieldId, message) {
 function clearErrors(formType) {
   const inputs = document.querySelectorAll(`#${formType}-content .form-input`);
   const errors = document.querySelectorAll(
-    `#${formType}-content .error-message`
+    `#${formType}-content .error-message`,
   );
 
   inputs.forEach((input) => input.classList.remove("error"));

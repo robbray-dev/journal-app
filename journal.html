@@ -1,20 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Journal Web App</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="main.css" />
+    <link rel="stylesheet" href="src/style.css" />
     <meta name="author" content="Robert Bray" />
   </head>
 
   <body>
+    <nav class="side-menu" id="sideMenu">
+      <a href="journal.html">Calendar</a>
+      <a href="entries.html">Entries</a>
+      <a href="#">Settings</a>
+    </nav>
     <div id="app">
       <!-- Top bar -->
       <header class="topbar" role="banner">
         <div class="topbar-left">
-          <button class="icon-btn" aria-label="Menu">☰</button>
+          <button class="icon-btn" id="menuBtn" aria-label="Menu">☰</button>
 
           <div class="search-box">
             <svg
@@ -195,6 +200,6 @@
         </form>
       </div>
     </div>
-    <script src="app.js"></script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
